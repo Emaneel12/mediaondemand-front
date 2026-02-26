@@ -11,6 +11,8 @@ import Link from "next/link";
 export default function HomePage() {
   const [items, setItems] = useState<ContentItem[]>([]);
   const [query, setQuery] = useState("");
+  const [logged, setLogged] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   async function load(q?: string) {
     const data = await getContents(q);
@@ -21,7 +23,11 @@ export default function HomePage() {
     load();
   }, []);
 
-  const logged = !!getToken();
+  useEffect(() => {
+    // Exécuté uniquement côté client
+    setMounted(true);
+    setLogged(!!getToken());
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -31,7 +37,7 @@ export default function HomePage() {
           Recherchez des vidéos et ebooks. (Backend à brancher ensuite)
         </p>
 
-        {!logged && (
+        {mounted && !logged && (
           <div className="mt-3 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm">
             Vous n’êtes pas connecté.{" "}
             <Link href="/login" className="underline">

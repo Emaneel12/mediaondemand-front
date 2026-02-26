@@ -6,10 +6,12 @@ import { getToken, logout } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const [logged, setLogged] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    setMounted(true);
     setLogged(!!getToken());
   }, []);
 
@@ -31,21 +33,21 @@ export default function Navbar() {
             Catalogue
           </Link>
 
-          {!logged ? (
+          {mounted && !logged ? (
             <Link
               href="/login"
               className="rounded-md bg-black px-3 py-1.5 text-white hover:opacity-90"
             >
               Se connecter
             </Link>
-          ) : (
+          ) : mounted && logged ? (
             <button
               onClick={onLogout}
               className="rounded-md border px-3 py-1.5 hover:bg-gray-50"
             >
               Déconnexion
             </button>
-          )}
+          ) : null}
         </nav>
       </div>
     </header>

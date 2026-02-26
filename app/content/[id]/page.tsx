@@ -8,21 +8,25 @@ import Link from "next/link";
 export default function ContentDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const [item, setItem] = useState<ContentItem | null>(null);
+  const [contentId, setContentId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const data = await getContentById(params.id);
+      const resolvedParams = await params;
+      setContentId(resolvedParams.id);
+
+      const data = await getContentById(resolvedParams.id);
       setItem(data);
     })();
-  }, [params.id]);
+  }, [params]);
 
   if (!item) {
     return (
       <div className="rounded-xl border bg-white p-5 shadow-sm">
-        <p className="text-sm text-gray-600">Contenu introuvable.</p>
+        <p className="text-sm text-gray-600">Chargement...</p>
         <Link className="mt-3 inline-block underline" href="/">
           ← Retour au catalogue
         </Link>
@@ -50,17 +54,20 @@ export default function ContentDetailPage({
           ))}
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-5 flex gap-3">
           <a
             href={item.fileUrl}
             target="_blank"
-            className="rounded-md bg-black px-4 py-2 text-sm text-white hover:opacity-90"
             rel="noreferrer"
+            className="rounded-md bg-black px-4 py-2 text-sm text-white hover:opacity-90"
           >
             {item.type === "ebook" ? "Ouvrir l’ebook" : "Lire la vidéo"}
           </a>
 
-          <Link href="/" className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50">
+          <Link
+            href="/"
+            className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50"
+          >
             Retour
           </Link>
         </div>
